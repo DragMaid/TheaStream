@@ -114,3 +114,14 @@ Keep your commit messages simple and clear:
 
 ---
 
+## 🙌 Need Help?
+
+Feel free to ask questions in the team chat or open a discussion thread in the repo.
+
+Thank you for helping make TheaStream better!
+
+```
+
+Let me know if you’d like this in Markdown file format or want to generate a `.gitignore`, `README.md`, or CI config as well.
+```
+
