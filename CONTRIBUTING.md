@@ -44,3 +44,24 @@ theastream/
 ```
 
 ---
+
+## 🌱 Branch Naming Convention
+
+Please use the following format for naming your branches:
+
+- `feature/<name>` – New features  
+- `fix/<name>` – Bug fixes  
+- `docs/<name>` – Documentation updates  
+- `refactor/<name>` – Code refactoring (no behavior change)
+
+Examples:
+```
+
+feature/livestream-ui
+fix/ticket-checkout-bug
+docs/update-readme
+refactor/auth-cleanup
+
+````
+
+---
