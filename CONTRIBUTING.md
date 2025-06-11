@@ -22,3 +22,25 @@ Below is the default folder structure for the project:
 
 ```
 
+theastream/
+├── manage.py
+├── requirements.txt
+├── util/               # Helper modules, APIs, and logic unrelated to frontend or views
+│   └── ...
+├── project/            # Main Django project settings
+│   ├── **init**.py
+│   ├── settings.py
+│   ├── urls.py
+│   ├── wsgi.py
+│   └── asgi.py
+├── app1/               # Django app (e.g., livestream, tickets, etc.)
+│   ├── models.py
+│   ├── views.py
+│   ├── urls.py
+│   └── ...
+├── app2/
+│   └── ...
+
+```
+
+---
