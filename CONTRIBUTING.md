@@ -75,3 +75,32 @@ Keep your commit messages simple and clear:
 
 ---
 
+## 🛠️ Setup & Run Instructions
+
+1. **Clone the repo**
+   ```bash
+   git clone <repo-url>
+   cd theastream
+````
+
+2. **Create a virtual environment**
+
+   ```bash
+   python -m venv venv
+   source venv/bin/activate    # On Windows: venv\Scripts\activate
+   ```
+
+3. **Install dependencies**
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Run the development server**
+
+   ```bash
+   python manage.py runserver
+   ```
+
+---
+
