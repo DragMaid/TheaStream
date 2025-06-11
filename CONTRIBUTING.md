@@ -65,3 +65,13 @@ refactor/auth-cleanup
 ````
 
 ---
+
+## ✅ Commit Message Guidelines
+
+Keep your commit messages simple and clear:
+
+- Use imperative tone: `Add`, `Fix`, `Update`, `Refactor`
+- Example: `Add AI assistant for livestream`, `Fix QR code link bug`
+
+---
+
