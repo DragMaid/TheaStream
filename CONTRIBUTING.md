@@ -104,3 +104,13 @@ Keep your commit messages simple and clear:
 
 ---
 
+## 🚫 Don't Push to `main`
+
+* **DO NOT push directly to the `main` branch.**
+* Always create a **new branch**, commit your work there, and then:
+
+  * Open a **Pull Request (PR)**
+  * Request at least **one team member to review** it before merging
+
+---
+
