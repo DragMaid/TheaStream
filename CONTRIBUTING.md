@@ -115,13 +115,10 @@ Keep your commit messages simple and clear:
 ---
 
 ## 🙌 Need Help?
+If you get stuck or need guidance:
 
-Feel free to ask questions in the team chat or open a discussion thread in the repo.
+Join our Discord server: https://discord.gg/x8DrG9YH9f
 
-Thank you for helping make TheaStream better!
+View our task board on Trello: https://trello.com/b/KTO7KFUV/theastream
 
-```
-
-Let me know if you’d like this in Markdown file format or want to generate a `.gitignore`, `README.md`, or CI config as well.
-```
-
+Don't hesitate to reach out—we’re here to help!
