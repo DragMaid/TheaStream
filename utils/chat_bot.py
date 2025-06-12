@@ -54,3 +54,24 @@ class ChatBot:
         self.chat_session = self.model.start_chat(history=[])
         self.test_authentication()
 
+    def test_authentication(self):
+        """Test if the API key is properly loaded and quota not exceeded."""
+        try:
+            _ = self.model.generate_content(
+                "hello", generation_config={"max_output_tokens": 5})
+            print("API Key loaded and connection successful.")
+        except ResourceExhausted:
+            print(
+                "Error: Quota exceeded or billing issue.")
+            exit()
+        except GoogleAPIError as e:
+            print(f"Error during API key test: {e}")
+            if "authentication" in str(e).lower():
+                print("Please check your GEMINI_API_KEY in the .env file.")
+            print("Please ensure your API key is correct and the model is accessible.")
+            exit()
+        except Exception as e:
+            print(f"An unexpected error occurred during API key test: {e}")
+            exit()
+
+    def test_link(self, url):
