@@ -1,44 +1,62 @@
-import os
+import whisper
+import torch
+import queue
 import sounddevice as sd
-from scipy.io.wavfile import write
-from google.cloud import speech_v1p1beta1 as speech
-from google.cloud import translate_v2 as translate
+import numpy as np
+import threading
+import time
 
-def record_audio(filename="temp.wav", duration=5, rate=16000):
-    print("🎤 Recording...")
-    audio = sd.rec(int(duration * rate), samplerate=rate, channels=1)
-    sd.wait()
-    write(filename, rate, audio)
-    print(f"✅ Saved: {filename}")
+# Load Whisper model (you can change to "base", "small", etc.)
+model = whisper.load_model(
+    "small", device="cuda" if torch.cuda.is_available() else "cpu")
 
-def transcribe_audio(filename):
-    client = speech.SpeechClient()
-    with open(filename, "rb") as audio_file:
-        content = audio_file.read()
+# Settings
+SAMPLE_RATE = 16000  # Whisper expects 16kHz
+CHUNK_DURATION = 5  # seconds
+BLOCK_SIZE = int(SAMPLE_RATE * CHUNK_DURATION)
 
-    audio = speech.RecognitionAudio(content=content)
-    config = speech.RecognitionConfig(
-        encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
-        sample_rate_hertz=16000,
-        language_code="auto",  # You can change to e.g. "ja-JP" for Japanese
-        enable_automatic_punctuation=True
-    )
+audio_queue = queue.Queue()
 
-    response = client.recognize(config=config, audio=audio)
-    transcript = ""
-    for result in response.results:
-        transcript += result.alternatives[0].transcript + " "
-    return transcript.strip()
+# Callback to capture microphone audio
 
-def translate_text(text, target="en"):
-    client = translate.Client()
-    translation = client.translate(text, target_language=target)
-    return translation['translatedText']
 
-if __name__ == "__main__":
-    record_audio("temp.wav", duration=5)
-    original_text = transcribe_audio("temp.wav")
-    print("🎧 Transcript:", original_text)
+def callback(indata, frames, time_info, status):
+    if status:
+        print(status)
+    audio_queue.put(indata.copy())
 
-    translated = translate_text(original_text, target="en")  # change "en" to any language code
-    print("🌍 Translated:", translated)
+# Background thread: continuously transcribes from audio queue
+
+
+def transcribe_loop():
+    print("🔊 Listening... Press Ctrl+C to stop.")
+    while True:
+        audio_chunk = audio_queue.get()
+        if audio_chunk is None:
+            break
+
+        # Convert to 1D float32 numpy array
+        audio_np = audio_chunk.flatten().astype(np.float32)
+
+        # Transcribe using Whisper
+        result = model.transcribe(
+            audio_np, language="en", fp16=torch.cuda.is_available())
+        print(f"[{time.strftime('%H:%M:%S')}] {result['text']}")
+
+# Start audio stream
+
+
+def start_stream():
+    threading.Thread(target=transcribe_loop, daemon=True).start()
+    with sd.InputStream(samplerate=SAMPLE_RATE, channels=1, callback=callback, blocksize=BLOCK_SIZE):
+        while True:
+            time.sleep(0.1)
+
+
+# Run the real-time transcription
+try:
+    start_stream()
+    print("Stream started")
+except KeyboardInterrupt:
+    print("\n🛑 Stopped.")
+
