@@ -1,3 +1,14 @@
+from dotenv import load_dotenv
+from pathlib import Path
+from os import getenv
+import urllib.request
+import base64
+from PIL import Image
+from io import BytesIO
+import google.generativeai as genai
+from google.generativeai.types import GenerationConfig, HarmCategory, HarmBlockThreshold
+from google.api_core.exceptions import GoogleAPIError, ResourceExhausted
+
 CONTEXT = """
 You are a friendly, knowledgeable cultural guide assisting senior tourists from around the world who are virtually watching a Cambodian theater play via livestream.
 Your job is to help them understand what they are seeing by answering any questions they have in simple, clear, and respectful language.
