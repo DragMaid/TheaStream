@@ -1,0 +1,41 @@
+<video id="localVideo" autoplay playsinline muted></video>
+<script>
+const ws = new WebSocket("ws://localhost:8000/ws/live/");
+const pc = new RTCPeerConnection();
+
+// Get camera
+navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
+    document.getElementById("localVideo").srcObject = stream;
+    stream.getTracks().forEach(track => pc.addTrack(track, stream));
+
+    createOffer();  // Offer when media is ready
+});
+
+async function createOffer() {
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    ws.send(JSON.stringify({ type: "offer", sdp: offer }));
+}
+
+// ICE candidates
+pc.onicecandidate = (event) => {
+    if (event.candidate) {
+        ws.send(JSON.stringify({ type: "candidate", candidate: event.candidate }));
+    }
+};
+
+// Receive answer or candidate from viewer
+ws.onmessage = async (event) => {
+    const data = JSON.parse(event.data);
+    console.log("📩 Streamer received:", data);
+
+    if (data.type === "answer") {
+        await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+    }
+
+    if (data.type === "candidate") {
+        await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+    }
+};
+</script>
+

@@ -1,0 +1,41 @@
+<video id="remoteVideo" autoplay playsinline controls></video>
+<script>
+const ws = new WebSocket("ws://localhost:8000/ws/live/");
+const pc = new RTCPeerConnection();
+
+// Handle incoming media
+pc.ontrack = (event) => {
+    console.log("🎥 Got remote track", event.streams);
+    document.getElementById("remoteVideo").srcObject = event.streams[0];
+};
+
+// ICE candidates
+pc.onicecandidate = (event) => {
+    if (event.candidate) {
+        ws.send(JSON.stringify({ type: "candidate", candidate: event.candidate }));
+    }
+};
+
+// ICE connection state
+pc.oniceconnectionstatechange = () => {
+    console.log("ICE state:", pc.iceConnectionState);
+};
+
+// When we get a message (offer/candidate)
+ws.onmessage = async (event) => {
+    const data = JSON.parse(event.data);
+    console.log("📩 Viewer received:", data);
+
+    if (data.type === "offer") {
+        await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        ws.send(JSON.stringify({ type: "answer", sdp: pc.localDescription }));
+    }
+
+    if (data.type === "candidate") {
+        await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+    }
+};
+</script>
+
