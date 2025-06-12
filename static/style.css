@@ -1,0 +1,40 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    padding: 20px;
+    color: #222;
+    text-align: center;
+}
+
+h1, h2 {
+    color: #333;
+}
+
+video {
+    display: block;
+    margin: 0 auto 20px auto; /* top: 0, right: auto, bottom: 20px, left: auto */
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+
+#ai-chat-box textarea {
+    resize: none;
+}
+
+button {
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #e6b800;
+}
+
+#ai-response-box {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    width: 70%;
+    margin-top: 20px;
+}
