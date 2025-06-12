@@ -75,3 +75,17 @@ class ChatBot:
             exit()
 
     def test_link(self, url):
+        """Ping the link and return response state."""
+        try:
+            request = urllib.request.Request(
+                url, headers={'User-Agent': 'Mozilla/5.0'})
+            with urllib.request.urlopen(request, timeout=10) as response:
+                return response.getcode() == 200
+        except urllib.error.URLError as e:
+            print(f"Error accessing URL {url}: {e.reason}")
+            return False
+        except Exception as e:
+            print(
+                f"An unexpected error occurred while testing link {url}: {e}")
+            return False
+
