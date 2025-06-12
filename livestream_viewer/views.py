@@ -5,5 +5,6 @@ from django.template import loader
 # Create your views here.
 
 def livestream_viewer(request):
-    template = loader.get_template("index.html")
-    return HttpResponse(template.render())
+    return render(request, "index.html", {
+        "video_url": "/media/videos/cambodian_theater.mp4"
+    })
