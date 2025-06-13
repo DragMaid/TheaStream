@@ -94,7 +94,6 @@
 
             mediaRecorder.start();
 
-            // Optional: stop recording after X seconds or silence
             setTimeout(() => {
                 stopRecording();
             }, 8000); // or wait for silence
@@ -132,7 +131,7 @@
 
             recognizer.on("result", (message) => {
                 const transcript = message.result.text.trim().toLowerCase();
-                console.log(`Result: ${transcript}`);
+                {% comment %}console.log(`Result: ${transcript}`);{% endcomment %}
                 if (call_lines.some(v => transcript.includes(v))) {
                     snd.play()
                     snd.currentTime = 0;
