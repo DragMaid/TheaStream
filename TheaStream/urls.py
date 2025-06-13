@@ -23,6 +23,7 @@ import os
 urlpatterns = [
     path('', include('livestream_viewer.urls')),
     path('admin/', admin.site.urls),
+    path("api/", include("transcribe.urls")),
 ]
 
 if settings.DEBUG:
