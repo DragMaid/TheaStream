@@ -74,6 +74,51 @@
 
     <script type="application/javascript" src="https://cdn.jsdelivr.net/npm/vosk-browser@0.0.5/dist/vosk.js"></script>
     <script>
+        let mediaRecorder;
+        let audioChunks = [];
+
+        async function startRecording() {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+
+            audioChunks = [];
+
+            mediaRecorder.ondataavailable = event => {
+                audioChunks.push(event.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                sendToServer(audioBlob);
+            };
+
+            mediaRecorder.start();
+
+            // Optional: stop recording after X seconds or silence
+            setTimeout(() => {
+                stopRecording();
+            }, 8000); // or wait for silence
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+            }
+        }
+
+        async function sendToServer(audioBlob) {
+            const formData = new FormData();
+            formData.append("audio", audioBlob, "command.webm");
+
+            const response = await fetch("/api/transcribe", {
+                method: "POST",
+                body: formData,
+            });
+
+            const result = await response.json();
+            console.log("Whisper transcript:", result.text);
+        }
+
         async function init() {
             // Load the Vosk model (make sure it's extracted, not a .zip file)
             const model = await Vosk.createModel('/static/models/model.zip');
@@ -81,18 +126,17 @@
             // Create a recognizer for 16kHz mono audio
             const recognizer = new model.KaldiRecognizer(16000);
 
+            var snd = new Audio('/static/audio/listening.mp3');
+
+            const call_lines = ["hey alex", "hi alex", "hello alex"];
+
             recognizer.on("result", (message) => {
                 const transcript = message.result.text.trim().toLowerCase();
                 console.log(`Result: ${transcript}`);
-                if (transcript === "hey siri") {
-                    console.log("yes");
-                }
-            });
-
-            recognizer.on("partialresult", (message) => {
-                const partial = message.result.partial?.trim().toLowerCase();
-                if (partial === "hey siri") {
-                    console.log("yes");
+                if (call_lines.some(v => transcript.includes(v))) {
+                    snd.play()
+                    snd.currentTime = 0;
+                    startRecording();
                 }
             });
 
