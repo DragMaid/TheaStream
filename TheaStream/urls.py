@@ -22,6 +22,7 @@ import os
 
 urlpatterns = [
     path('', include('livestream_viewer.urls')),
+    path('', include('did.urls')),
     path('admin/', admin.site.urls),
 ]
 

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>DID Authentication</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tweetnacl@1.0.3/nacl-fast.min.js"></script>
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== "") {
+                const cookies = document.cookie.split(";");
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === name + "=") {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        const csrftoken = getCookie("csrftoken");
+    </script>
+</head>
+
+<body class="bg-zinc-900 text-white min-h-screen flex items-center justify-center">
+    <form style="display: none;">{% csrf_token %}</form>
+
+    <div class="bg-zinc-800 p-8 rounded-xl shadow-xl w-full max-w-md text-center space-y-6">
+        <h1 class="text-2xl font-semibold">Welcome</h1>
+        <p class="text-zinc-400">Authenticate using your Decentralized Identifier (DID).</p>
+
+        <div class="flex flex-col space-y-4">
+            <button onclick="generateDID()"
+                class="bg-green-500 hover:bg-green-400 text-white font-semibold py-2 rounded-lg">
+                Generate New DID
+            </button>
+
+            <label class="text-left text-sm text-zinc-400">Import Private Key</label>
+            <textarea id="import_key" rows="4" class="w-full p-3 bg-zinc-700 text-sm rounded-md text-white"
+                placeholder="Paste your private key..."></textarea>
+
+            <button onclick="importDID()"
+                class="bg-blue-500 hover:bg-blue-400 text-white font-semibold py-2 rounded-lg">
+                Import Existing DID
+            </button>
+        </div>
+
+        <p id="status" class="text-sm text-zinc-300 pt-4"></p>
+    </div>
+
+    <script>
+        function arrayToBase64(arr) {
+            return btoa(String.fromCharCode(...arr));
+        }
+
+        function base64ToArray(str) {
+            return Uint8Array.from(atob(str), c => c.charCodeAt(0));
+        }
+
+        async function generateDID() {
+            const keypair = nacl.sign.keyPair(); // TweetNaCl Ed25519 keypair
+
+            const did = "did:example:" + arrayToBase64(keypair.publicKey);
+            const privKeyBase64 = arrayToBase64(keypair.secretKey);
+
+            // Save private key to localStorage
+            localStorage.setItem("did_private_key", privKeyBase64);
+
+            sendToServer(did, keypair.publicKey);
+        }
+
+        async function importDID() {
+            const input = document.getElementById('import_key').value.trim();
+            if (!input) return updateStatus("Please paste a private key.");
+
+            try {
+                const privateKey = base64ToArray(input);
+                const keypair = nacl.sign.keyPair.fromSecretKey(privateKey);
+                const did = "did:example:" + arrayToBase64(keypair.publicKey);
+
+                localStorage.setItem("did_private_key", input);
+                sendToServer(did, keypair.publicKey);
+            } catch (e) {
+                console.error(e);
+                updateStatus("Invalid private key format.");
+            }
+        }
+
+        function updateStatus(msg) {
+            document.getElementById("status").innerText = msg;
+        }
+
+        async function sendToServer(did, publicKey) {
+            const formData = new FormData();
+            formData.append("did", did);
+            Array.from(publicKey).forEach(byte => formData.append("public_key[]", byte));
+
+            try {
+                const res = await fetch("/register-did/", {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-CSRFToken": getCookie("csrftoken")  // getCookie function defined earlier
+                    },
+                    credentials: "include"
+                });
+
+                if (res.ok) {
+                    updateStatus("Authenticated. Redirecting...");
+                    setTimeout(() => window.location.href = "/livestream_viewer", 1200);
+                } else {
+                    updateStatus("Failed to authenticate.");
+                }
+            } catch (err) {
+                console.error(err);
+                updateStatus("Error connecting to server.");
+            }
+        }
+    </script>
+</body>
+
+</html>
