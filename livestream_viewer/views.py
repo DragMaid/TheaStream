@@ -12,10 +12,12 @@ ai_bot = ChatBot()
 
 # Create your views here.
 
+
 def livestream_viewer(request):
     return render(request, "index.html", {
-        "video_url": "/media/videos/cambodian_theater.mp4"
+        "video_url": "/media/videos/test1.mp4"
     })
+
 
 @csrf_exempt
 def ask_ai(request):
