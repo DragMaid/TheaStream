@@ -15,7 +15,7 @@ ai_bot = ChatBot()
 
 def livestream_viewer(request):
     return render(request, "index.html", {
-        "video_url": "/media/videos/cambodian_theater.mp4"
+        "video_url": "/media/videos/test1.mp4"
     })
 
 

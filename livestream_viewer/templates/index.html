@@ -225,6 +225,7 @@
             mediaRecorder.onstop = () => {
                 const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                 sendToServer(audioBlob);
+                console.log("Sent new audio to server for transcription")
             };
 
             mediaRecorder.start();
