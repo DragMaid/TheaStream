@@ -145,6 +145,15 @@
             }
         }
 
+        function updateLastUserMessage(newText) {
+            const chat = document.getElementById("chat-history");
+            const messages = chat.querySelectorAll(".justify-end");
+            if (messages.length > 0) {
+                const last = messages[messages.length - 1];
+                last.querySelector("div").innerText = newText;
+            }
+        }
+
         // --- VOSK Toggle ---
         let voskEnabled = false;
         let recognizer = null;
