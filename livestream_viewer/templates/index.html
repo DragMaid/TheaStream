@@ -83,10 +83,15 @@
             e.preventDefault();
             const textarea = document.getElementById("user_message");
             const question = textarea.value.trim();
+            textarea.value = "";
+            addMessage("user", "...");
+            await askAI(question);
+        }
+
+        async function askAI(question) {
             if (!question) return;
 
-            addMessage("user", question);
-            textarea.value = "";
+            updateLastUserMessage(question);
 
             const video = document.getElementById('theater-video');
             const canvas = document.createElement('canvas');
