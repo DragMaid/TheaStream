@@ -184,7 +184,9 @@
             recognizer.on("result", (message) => {
                 const transcript = message.result.text.trim().toLowerCase();
                 if (call_lines.some(v => transcript.includes(v))) {
-                    snd.play();
+                    {% comment %}snd.play();{% endcomment %}
+                    console.log("Started recording");
+                    addMessage("ai", "I'm listening!")
                     snd.currentTime = 0;
                     startRecording();
                 }
