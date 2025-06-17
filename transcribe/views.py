@@ -1,9 +1,11 @@
-# yourapp/views.py
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from utils.transcribe import transcribe
+from utils.transcribe import Transcriber
 import tempfile
+
+
+transcriber = Transcriber()
 
 
 @csrf_exempt
@@ -19,7 +21,7 @@ def transcribe_audio(request):
         temp_audio.flush()
 
         try:
-            result_text = transcribe(temp_audio.name)
+            result_text = transcriber.transcribe(temp_audio.name)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
 
