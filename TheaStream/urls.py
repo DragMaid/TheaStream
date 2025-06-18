@@ -25,6 +25,7 @@ urlpatterns = [
     path('', include('did.urls')),
     path('admin/', admin.site.urls),
     path("api/", include("transcribe.urls")),
+    path("", include("all.urls")),
 ]
 
 if settings.DEBUG:
