@@ -6,7 +6,6 @@ export default function TheaterDashboard() {
     <>
       <Head>
         <title>Theater Admin Dashboard</title>
-        <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://unpkg.com/@phosphor-icons/web"></script>
       </Head>
 

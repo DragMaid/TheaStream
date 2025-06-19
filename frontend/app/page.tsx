@@ -5,7 +5,6 @@ export default function RoleSelectionPage() {
     <>
       <Head>
         <title>Login | Choose Role</title>
-        <script src="https://cdn.tailwindcss.com"></script>
       </Head>
 
       <div className="min-h-screen bg-zinc-900 text-white flex flex-col items-center justify-center px-4">
