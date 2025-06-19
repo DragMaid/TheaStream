@@ -31,7 +31,7 @@ export default function PurchasedPage() {
                 <p className="text-xs text-zinc-500 mt-1">Paid: $2.00</p>
               </div>
               <a
-                href="/media/videos/performance1.mp4"
+                href="../audience/livestream/watch"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full text-center bg-yellow-400 text-black py-2 px-4 rounded-lg font-medium hover:bg-yellow-300 transition"
@@ -59,7 +59,7 @@ export default function PurchasedPage() {
                 <p className="text-xs text-zinc-500 mt-1">Paid: $3.50</p>
               </div>
               <a
-                href="/media/videos/performance2.mp4"
+                href="../audience/livestream/watch"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full text-center bg-yellow-400 text-black py-2 px-4 rounded-lg font-medium hover:bg-yellow-300 transition"
