@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from utils.transcribe import Transcriber
+from .transcriber import Transcriber
 import tempfile
 
 
