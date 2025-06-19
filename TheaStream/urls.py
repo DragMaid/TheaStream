@@ -21,7 +21,6 @@ from django.conf.urls.static import static
 import os
 
 urlpatterns = [
-    path('', include('livestream_viewer.urls')),
     path('admin/', admin.site.urls),
     path("api/", include("transcribe.urls")),
 ]
