@@ -22,3 +22,15 @@ def serve_video(request, filename):
     return response
 
 
+@csrf_exempt
+def serve_voice_model(request, filename):
+    path = os.path.join('static', 'models', filename)
+    if not os.path.exists(path):
+        print("fuck")
+        raise Http404("File not found")
+
+    response = FileResponse(open(path, 'rb'), content_type='application/zip')
+    response['Access-Control-Allow-Origin'] = '*'
+    response['Access-Control-Allow-Headers'] = '*'
+    response['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
+    return response
