@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 
-from utils.chat_bot import ChatBot
+from .chat_bot import ChatBot
 
 ai_bot = ChatBot()
 
