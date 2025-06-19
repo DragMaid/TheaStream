@@ -1,5 +1,6 @@
 import asyncio
 import os
+from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.conf import settings
@@ -9,6 +10,12 @@ from utils.chat_bot import ChatBot
 
 ai_bot = ChatBot()
 
+# Create your views here.
+
+def livestream_viewer(request):
+    return render(request, "index.html", {
+        "video_url": "/media/videos/cambodian_theater.mp4"
+    })
 
 @csrf_exempt
 def ask_ai(request):
