@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <title>Cambodian Theater</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vosk-browser@0.0.5/dist/vosk.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vosk-browser@0.0.8/dist/vosk.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 
@@ -83,10 +83,15 @@
             e.preventDefault();
             const textarea = document.getElementById("user_message");
             const question = textarea.value.trim();
+            textarea.value = "";
+            addMessage("user", "...");
+            await askAI(question);
+        }
+
+        async function askAI(question) {
             if (!question) return;
 
-            addMessage("user", question);
-            textarea.value = "";
+            updateLastUserMessage(question);
 
             const video = document.getElementById('theater-video');
             const canvas = document.createElement('canvas');
@@ -140,6 +145,15 @@
             }
         }
 
+        function updateLastUserMessage(newText) {
+            const chat = document.getElementById("chat-history");
+            const messages = chat.querySelectorAll(".justify-end");
+            if (messages.length > 0) {
+                const last = messages[messages.length - 1];
+                last.querySelector("div").innerText = newText;
+            }
+        }
+
         // --- VOSK Toggle ---
         let voskEnabled = false;
         let recognizer = null;
@@ -170,7 +184,9 @@
             recognizer.on("result", (message) => {
                 const transcript = message.result.text.trim().toLowerCase();
                 if (call_lines.some(v => transcript.includes(v))) {
-                    snd.play();
+                    {% comment %}snd.play();{% endcomment %}
+                    console.log("Started recording");
+                    addMessage("ai", "I'm listening!")
                     snd.currentTime = 0;
                     startRecording();
                 }
@@ -212,12 +228,17 @@
         // Voice capture
         let mediaRecorder;
         let audioChunks = [];
+        let silenceTimeout;
+        let processor;
+        let source;
+        let audioContextMonitor;
 
         async function startRecording() {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             mediaRecorder = new MediaRecorder(stream);
             audioChunks = [];
 
+            // Start recording audio chunks
             mediaRecorder.ondataavailable = event => {
                 audioChunks.push(event.data);
             };
@@ -225,11 +246,35 @@
             mediaRecorder.onstop = () => {
                 const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                 sendToServer(audioBlob);
-                console.log("Sent new audio to server for transcription")
+                console.log("✅ Sent audio to server for transcription");
+                addMessage("user", "...")
+                stopMonitoring(); // stop analyser
             };
 
             mediaRecorder.start();
-            setTimeout(() => stopRecording(), 8000);
+            console.log("🎙️ Recording started");
+
+            // Setup volume monitoring
+            audioContextMonitor = new AudioContext();
+            processor = audioContextMonitor.createScriptProcessor(2048, 1, 1);
+            source = audioContextMonitor.createMediaStreamSource(stream);
+
+            source.connect(processor);
+            processor.connect(audioContextMonitor.destination);
+
+            processor.onaudioprocess = function (e) {
+                const input = e.inputBuffer.getChannelData(0);
+                const isSilent = input.every(sample => Math.abs(sample) < 0.01); // silence threshold
+
+                if (!isSilent) {
+                    // Reset the silence timeout
+                    clearTimeout(silenceTimeout);
+                    silenceTimeout = setTimeout(() => stopRecording(), 1000); // 2s silence
+                }
+            };
+
+            // Start the silence timer immediately in case they never speak
+            silenceTimeout = setTimeout(() => stopRecording(), 8000); // fallback max time
         }
 
         function stopRecording() {
